@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { ClipboardCheck, Filter, Clock, CheckCircle2, XCircle, FileText, Calendar, PenTool as Tool } from 'lucide-react'
+import { ClipboardCheck, Clock, CheckCircle2, XCircle, FileText, Calendar, PenTool as Tool } from 'lucide-react'
 
 interface Approval {
   id: number;
@@ -51,8 +51,6 @@ const initialApprovals: Approval[] = [
 
 const Approvals = () => {
   const [approvals, setApprovals] = useState<Approval[]>(initialApprovals);
-  const [selectedType, setSelectedType] = useState<string>("all");
-  const [selectedStatus, setSelectedStatus] = useState<string>("all");
   const [newRequestModalOpen, setNewRequestModalOpen] = useState(false);
 
   // State for New Request Form
@@ -131,12 +129,6 @@ const Approvals = () => {
     }
   };
 
-  const filteredApprovals = approvals.filter(approval => {
-    const typeMatch = selectedType === "all" || approval.type === selectedType;
-    const statusMatch = selectedStatus === "all" || approval.status === selectedStatus;
-    return typeMatch && statusMatch;
-  });
-
   return (
     <div className="container mx-auto mt-20 px-4">
       <motion.div
@@ -159,40 +151,9 @@ const Approvals = () => {
             New Request
           </motion.button>
         </div>
-
-        <div className="mt-8 flex flex-wrap gap-4">
-          <div className="flex items-center gap-2 bg-powder-50 px-4 py-2 rounded-xl">
-            <Filter className="w-4 h-4 text-powder-600" />
-            <select
-              value={selectedType}
-              onChange={(e) => setSelectedType(e.target.value)}
-              className="bg-transparent text-sm font-medium text-powder-800 focus:outline-none"
-            >
-              <option value="all">All Types</option>
-              <option value="event">Events</option>
-              <option value="budget">Budget</option>
-              <option value="leave">Leave</option>
-              <option value="equipment">Equipment</option>
-            </select>
-          </div>
-          <div className="flex items-center gap-2 bg-powder-50 px-4 py-2 rounded-xl">
-            <Clock className="w-4 h-4 text-powder-600" />
-            <select
-              value={selectedStatus}
-              onChange={(e) => setSelectedStatus(e.target.value)}
-              className="bg-transparent text-sm font-medium text-powder-800 focus:outline-none"
-            >
-              <option value="all">All Status</option>
-              <option value="pending">Pending</option>
-              <option value="approved">Approved</option>
-              <option value="rejected">Rejected</option>
-            </select>
-          </div>
-        </div>
       </motion.div>
-
       <div className="grid grid-cols-1 gap-6">
-        {filteredApprovals.map((approval) => (
+        {approvals.map((approval) => (
           <motion.div
             key={approval.id}
             initial={{ opacity: 0, y: 20 }}
@@ -291,7 +252,6 @@ const Approvals = () => {
                   <option value="leave">Leave</option>
                   <option value="equipment">Equipment</option>
                 </select>
-
                 <label htmlFor="requestedBy" className="block text-gray-700 text-sm font-bold mb-2 mt-4">Requested By:</label>
                 <input
                   type="text"
@@ -359,3 +319,5 @@ const Approvals = () => {
   );
 };
 export default Approvals;
+
+
