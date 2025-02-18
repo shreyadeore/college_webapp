@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { MessageSquare, Filter, Send, Clock, CheckCircle2, AlertTriangle } from 'lucide-react';
+import { MessageSquare, Send, CheckCircle2 } from 'lucide-react';
 
 interface Complaint {
   id: number;
@@ -46,14 +46,10 @@ const complaints: Complaint[] = [
   }
 ];
 
-const categories = ["All", "Infrastructure", "Academic", "Facilities", "Administration"];
-const priorities = ["All", "High", "Medium", "Low"];
-const statuses = ["All", "Pending", "In Progress", "Resolved"];
+const categories = ["Infrastructure", "Academic", "Facilities", "Administration"];
+const priorities = ["High", "Medium", "Low"];
 
 const Complaints = () => {
-  const [selectedCategory, setSelectedCategory] = useState("All");
-  const [selectedPriority, setSelectedPriority] = useState("All");
-  const [selectedStatus, setSelectedStatus] = useState("All");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const getStatusColor = (status: string) => {
@@ -104,45 +100,6 @@ const Complaints = () => {
             New Complaint
           </motion.button>
         </div>
-
-        <div className="mt-8 flex flex-wrap gap-4">
-          <div className="flex items-center gap-2 bg-powder-50 px-4 py-2 rounded-xl">
-            <Filter className="w-4 h-4 text-powder-600" />
-            <select
-              value={selectedCategory}
-              onChange={(e) => setSelectedCategory(e.target.value)}
-              className="bg-transparent text-sm font-medium text-powder-800 focus:outline-none"
-            >
-              {categories.map((category) => (
-                <option key={category} value={category}>{category}</option>
-              ))}
-            </select>
-          </div>
-          <div className="flex items-center gap-2 bg-powder-50 px-4 py-2 rounded-xl">
-            <AlertTriangle className="w-4 h-4 text-powder-600" />
-            <select
-              value={selectedPriority}
-              onChange={(e) => setSelectedPriority(e.target.value)}
-              className="bg-transparent text-sm font-medium text-powder-800 focus:outline-none"
-            >
-              {priorities.map((priority) => (
-                <option key={priority} value={priority}>{priority}</option>
-              ))}
-            </select>
-          </div>
-          <div className="flex items-center gap-2 bg-powder-50 px-4 py-2 rounded-xl">
-            <Clock className="w-4 h-4 text-powder-600" />
-            <select
-              value={selectedStatus}
-              onChange={(e) => setSelectedStatus(e.target.value)}
-              className="bg-transparent text-sm font-medium text-powder-800 focus:outline-none"
-            >
-              {statuses.map((status) => (
-                <option key={status} value={status}>{status}</option>
-              ))}
-            </select>
-          </div>
-        </div>
       </motion.div>
 
       <div className="grid grid-cols-1 gap-6">
@@ -190,7 +147,6 @@ const Complaints = () => {
           </motion.div>
         ))}
       </div>
-
       {isSubmitting && (
         <motion.div
           initial={{ opacity: 0 }}
@@ -223,7 +179,7 @@ const Complaints = () => {
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Category</label>
                   <select className="w-full px-4 py-2 rounded-xl border border-powder-100 focus:outline-none focus:ring-2 focus:ring-powder-500">
-                    {categories.slice(1).map((category) => (
+                    {categories.map((category) => (
                       <option key={category} value={category}>{category}</option>
                     ))}
                   </select>
@@ -231,7 +187,7 @@ const Complaints = () => {
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Priority</label>
                   <select className="w-full px-4 py-2 rounded-xl border border-powder-100 focus:outline-none focus:ring-2 focus:ring-powder-500">
-                    {priorities.slice(1).map((priority) => (
+                    {priorities.map((priority) => (
                       <option key={priority} value={priority.toLowerCase()}>{priority}</option>
                     ))}
                   </select>
