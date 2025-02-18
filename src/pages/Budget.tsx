@@ -1,17 +1,30 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
-import { Wallet, TrendingUp, TrendingDown, PlusCircle } from "lucide-react";
+import { Wallet, TrendingUp, TrendingDown, PlusCircle, Upload } from "lucide-react";
+
+interface BudgetEntry {
+  category: string;
+  amount: number;
+  date: string;
+  notes: string;
+  receipts?: string[]; // URLs of uploaded receipts
+  status?: 'pending' | 'approved' | 'rejected'; // Approval status
+  approverRole?: 'faculty' | 'incharge' | null;
+}
 
 // Initial Budget Data (Simulating Budget.tsv)
-const initialBudgetData = [
-  { category: "Rent", amount: 10000, date: "2025-02-15", notes: "Monthly rent" },
-  { category: "Groceries", amount: 5000, date: "2025-02-14", notes: "Weekly groceries" },
-  { category: "Utilities", amount: 3000, date: "2025-02-10", notes: "Electricity & water bills" },
+const initialBudgetData: BudgetEntry[] = [
+  { category: "Rent", amount: 10000, date: "2025-02-15", notes: "Monthly rent", status: 'approved' },
+  { category: "Groceries", amount: 5000, date: "2025-02-14", notes: "Weekly groceries", status: 'approved' },
+  { category: "Utilities", amount: 3000, date: "2025-02-10", notes: "Electricity & water bills", status: 'approved' },
 ];
 
 const Budget = () => {
   const [budgetData, setBudgetData] = useState(initialBudgetData);
   const [newEntry, setNewEntry] = useState({ category: "", amount: "", date: "", notes: "" });
+  const [receipts, setReceipts] = useState<File[]>([]); // State for uploaded receipts in the form
+  const [newEntryStatus, setNewEntryStatus] = useState<'pending' | 'approved' | 'rejected'>('pending');
+  const [newEntryApproverRole, setNewEntryApproverRole] = useState<'faculty' | 'incharge'>('faculty');
 
   // Handle Input Change
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -22,23 +35,40 @@ const Budget = () => {
     }));
   };
 
+  const handleReceiptChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files) {
+      setReceipts(Array.from(e.target.files));
+    }
+  };
+
+
   // Add New Budget Entry
-  const addBudgetEntry = () => {
+  const addBudgetEntry = async () => {
     if (!newEntry.category || !newEntry.amount || !newEntry.date) {
       alert("Please fill in Category, Amount, and Date.");
       return;
     }
 
-    const formattedEntry = {
+    // Simulate uploading receipts and getting URLs
+    const receiptUrls = receipts.map(file => `https://example.com/receipts/${file.name}`);
+
+    const formattedEntry: BudgetEntry = {
       category: newEntry.category,
       amount: parseFloat(newEntry.amount), // Convert to number
       date: newEntry.date,
       notes: newEntry.notes || "—",
+      receipts: receiptUrls, // Add receipt URLs to the entry
+      status: newEntryStatus,
+      approverRole: newEntryApproverRole
     };
 
     setBudgetData([...budgetData, formattedEntry]);
     setNewEntry({ category: "", amount: "", date: "", notes: "" }); // Reset Form
+    setReceipts([]); // Reset receipts
+    setNewEntryStatus('pending'); //reset Status
+    setNewEntryApproverRole('faculty'); //reset Approver Role
   };
+
 
   return (
     <div className="container mx-auto mt-20 px-4">
@@ -83,6 +113,9 @@ const Budget = () => {
               <th className="py-2 px-4">Amount</th>
               <th className="py-2 px-4">Date</th>
               <th className="py-2 px-4">Notes</th>
+              <th className="py-2 px-4">Receipts</th> {/* New column */}
+              <th className="py-2 px-4">Status</th>
+              <th className="py-2 px-4">Approver</th>
             </tr>
           </thead>
           <tbody>
@@ -92,6 +125,19 @@ const Budget = () => {
                 <td className="py-2 px-4">₹{item.amount}</td>
                 <td className="py-2 px-4">{item.date}</td>
                 <td className="py-2 px-4">{item.notes}</td>
+                <td className="py-2 px-4">
+                  {item.receipts && item.receipts.length > 0 ? (
+                    item.receipts.map((url, i) => (
+                      <a key={i} href={url} target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline block">
+                        Receipt {i + 1}
+                      </a>
+                    ))
+                  ) : (
+                    "—"
+                  )}
+                </td>
+                <td className="py-2 px-4">{item.status}</td>
+                <td className="py-2 px-4">{item.approverRole}</td>
               </tr>
             ))}
           </tbody>
@@ -101,7 +147,7 @@ const Budget = () => {
       {/* Add New Budget Entry */}
       <motion.div className="bg-white p-6 rounded-2xl shadow-soft border mt-8">
         <h2 className="text-xl font-bold text-gray-900 mb-4">Add New Budget</h2>
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <input
             type="text"
             name="category"
@@ -125,6 +171,25 @@ const Budget = () => {
             onChange={handleChange}
             className="border p-2 rounded-md"
           />
+           <select
+              value={newEntryStatus}
+              onChange={(e) => setNewEntryStatus(e.target.value as 'pending' | 'approved' | 'rejected')}
+              className="border p-2 rounded-md"
+            >
+              <option value="pending">Pending</option>
+              <option value="approved">Approved</option>
+              <option value="rejected">Rejected</option>
+            </select>
+            <select
+              value={newEntryApproverRole}
+              onChange={(e) => setNewEntryApproverRole(e.target.value as 'faculty' | 'incharge')}
+              className="border p-2 rounded-md"
+            >
+              <option value="faculty">Faculty</option>
+              <option value="incharge">Incharge</option>
+            </select>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
           <input
             type="text"
             name="notes"
@@ -133,6 +198,27 @@ const Budget = () => {
             onChange={handleChange}
             className="border p-2 rounded-md"
           />
+          <div>
+            <label htmlFor="receipts" className="block text-gray-700 text-sm font-bold mb-2">
+              Receipts:
+            </label>
+            <input
+              type="file"
+              id="receipts"
+              multiple
+              onChange={handleReceiptChange}
+              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+            />
+            {receipts.length > 0 && (
+              <div className="mt-2">
+                {receipts.map((file, index) => (
+                  <p key={index} className="text-sm text-gray-600">
+                    {file.name}
+                  </p>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
         <button
           onClick={addBudgetEntry}
@@ -146,3 +232,4 @@ const Budget = () => {
 };
 
 export default Budget;
+
