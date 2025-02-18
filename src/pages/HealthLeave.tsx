@@ -19,6 +19,12 @@ const HealthLeave = () => {
   const [newHealth, setNewHealth] = useState({ date: "", description: "", doctor: "", status: "" });
   const [newLeave, setNewLeave] = useState({ date: "", reason: "", duration: "", status: "Pending" });
 
+  // Mock function for sending emails (replace with actual email sending logic)
+  const sendEmail = (to: string, subject: string, body: string) => {
+    console.log(`Sending email to: ${to}\nSubject: ${subject}\nBody: ${body}`);
+    // In a real application, you would use a library like Nodemailer or SendGrid to send emails.
+  };
+
   // Handle Input Change
   const handleHealthChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -43,6 +49,13 @@ const HealthLeave = () => {
       return;
     }
 
+    // Simulate reporting sick by the college doctor and sending an email
+    const studentName = "John Doe"; // Replace with actual student name
+    const classCoordinatorEmail = "classcoordinator@example.com"; // Replace with actual email
+
+    const healthReportBody = `Student ${studentName} reported sick on ${newHealth.date} with description: ${newHealth.description}. Doctor: ${newHealth.doctor}`;
+    sendEmail(classCoordinatorEmail, `Health Report for ${studentName}`, healthReportBody);
+
     setHealthData([...healthData, newHealth]);
     setNewHealth({ date: "", description: "", doctor: "", status: "" });
   };
@@ -53,6 +66,13 @@ const HealthLeave = () => {
       alert("Please fill in all fields for Leave Request.");
       return;
     }
+
+    // Simulate student leaving campus and sending an email to parents
+    const studentName = "John Doe"; // Replace with actual student name
+    const parentEmail = "parent@example.com"; // Replace with actual email
+
+    const leaveNotificationBody = `Student ${studentName} has requested leave on ${newLeave.date} for reason: ${newLeave.reason} for ${newLeave.duration}.`;
+    sendEmail(parentEmail, `Leave Request for ${studentName}`, leaveNotificationBody);
 
     setLeaveData([...leaveData, newLeave]);
     setNewLeave({ date: "", reason: "", duration: "", status: "Pending" });
@@ -164,3 +184,4 @@ const HealthLeave = () => {
 };
 
 export default HealthLeave;
+
